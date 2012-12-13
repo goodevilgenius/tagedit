@@ -102,7 +102,7 @@ _eof
 
 for i in "$@"; do
   case "$i" in
-    *.ogg|*.oga|*.ogv|*.ogx|*.spx)
+    *.ogg|*.oga|*.ogv|*.ogx|*.spx|*.mp3)
       if [ ! -r "$i" ]; then
         echo "E: $ME: unreadable file: $i" >&2
         exit 2
@@ -115,24 +115,11 @@ for i in "$@"; do
 
       echo ": $i"
       echo "+ $i"
-      vorbiscomment -l "$i"
-      echo
-      ;;
-
-    *.mp3)
-      if [ ! -r "$i" ]; then
-        echo "E: $ME: unreadable file: $i" >&2
-        exit 2
+      if [ "${i##*.}" = "mp3" ];then
+	  id3v2 -R "$i" | sed -nr -e 's/^(COMM): \((.*)\)\[(.*)\]: (.*)/\1=\2:\4:\3/p' -e 's/^([A-Z0-9]{3,4}): (.+)/\1=\2/p' | egrep -v '^(PRIV|APIC)'
+      else
+	  vorbiscomment -l "$i"
       fi
-
-      if [ ! -w "$i" ]; then
-        echo "E: $ME: unwriteable file: $i" >&2
-        exit 3
-      fi
-
-      echo ": $i"
-      echo "+ $i"
-      id3v2 -R "$i" | sed -nr -e 's/^(COMM): \((.*)\)\[(.*)\]: (.*)/\1=\2:\4:\3/p' -e 's/^([A-Z0-9]{3,4}): (.+)/\1=\2/p' | egrep -v '^(PRIV|APIC)'
       echo
       ;;
 
