@@ -55,6 +55,10 @@ if ! command -v vorbiscomment >/dev/null; then
   echo "E: $ME: vorbiscomment not found in \$PATH." >&2
   exit -1
 fi
+if ! command -v id3v2 >/dev/null; then
+  echo "E: $ME: id3v2 not found in \$PATH." >&2
+  exit -1
+fi
 
 old_IFS="$IFS"
 IFS="
@@ -76,11 +80,17 @@ cat <<_eof > $TMPFILE
 # DO NOT touch lines starting with a colon (:)!
 # You may use lines starting with a plus (+) to rename files.
 #
+# When modifying id3 tags, tags can remain unmodified by 
+# deleting the line. To remove an id3, set the tag to an
+# empty value.
+#
 # We are in directory:
 #  $(pwd)
 #
 # Tags that should be applied to all files can be specified
 # before the first per-file tag definiton starts.
+# Be aware that using global tags when mixing id3 tags and 
+# vorbis comments can have unexpected results.
 
 _eof
 
@@ -100,6 +110,23 @@ for i in "$@"; do
       echo ": $i"
       echo "+ $i"
       vorbiscomment -l "$i"
+      echo
+      ;;
+
+    *.mp3)
+      if [ ! -r "$i" ]; then
+        echo "E: $ME: unreadable file: $i" >&2
+        exit 2
+      fi
+
+      if [ ! -w "$i" ]; then
+        echo "E: $ME: unwriteable file: $i" >&2
+        exit 3
+      fi
+
+      echo ": $i"
+      echo "+ $i"
+      id3v2 -R "$i" | sed -nr 's/^([A-Z]{3,4}): (.+)/\1=\2/p'
       echo
       ;;
 
@@ -140,8 +167,12 @@ echo "I: processing files..." >&2
 write_tags() {
   echo -n "I:   processing $file... " >&2
   local file="$1"; shift
-  for tag; do [ -n "${tag:-}" ] && echo "$tag"; done | \
-    vorbiscomment -w "$file"
+  if [ "${file##*.}" == "mp3" ]; then
+      echo "Modifying id3 tags not yet implemented"
+  else
+      for tag; do [ -n "${tag:-}" ] && echo "$tag"; done | \
+	  vorbiscomment -w "$file"
+  fi
   if [ -n "${filename_new:-}" ] && [ "${filename_new:-}" != "$file" ]; then
     echo; echo -n "I:     renaming to $filename_new... " >&2
     mv "$file" "$filename_new"
