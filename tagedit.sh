@@ -8,7 +8,7 @@
 # Based on vorbistagedit copyright © martin f. krafft <madduck@madduck.net>
 #
 
-VERSION=0.6.2
+VERSION=0.6.2.1
 ME=${0##*/}
 
 versioninfo() {
@@ -164,7 +164,7 @@ write_tags() {
       while [ $# -gt 0 ]; do
       echo "$1" | while read tag; do
 	  [ -z "$tag" ] && continue
-	  echo id3v2 --"${tag%%=*}" "${tag#*=}" "$file"
+	  id3v2 --"${tag%%=*}" "${tag#*=}" "$file"
       done
       shift
       done
