@@ -8,7 +8,7 @@
 # Based on vorbistagedit copyright © martin f. krafft <madduck@madduck.net>
 #
 
-VERSION=0.6.1
+VERSION=0.6.2
 ME=${0##*/}
 
 versioninfo() {
@@ -161,9 +161,12 @@ write_tags() {
   echo -n "I:   processing $file... " >&2
   local file="$1"; shift
   if [ "${file##*.}" = "mp3" ]; then
-      for tag; do 
+      while [ $# -gt 0 ]; do
+      echo "$1" | while read tag; do
 	  [ -z "$tag" ] && continue
-	  id3v2 --"${tag%%=*}" "${tag#*=}" "$file"
+	  echo id3v2 --"${tag%%=*}" "${tag#*=}" "$file"
+      done
+      shift
       done
   else
       for tag; do [ -n "${tag:-}" ] && echo "$tag"; done | \
