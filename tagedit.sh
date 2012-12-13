@@ -1,19 +1,21 @@
 #!/bin/sh -eu
 
-# vorbistagedit -- allows batch editing of vorbis comments with an editor
+# tagedit -- allows batch editing of vorbis comments and id3 tags with an editor
 #
-# Copyright © martin f. krafft <madduck@madduck.net>
-# Released under the terms of the Artistic Licence 2.0
+# Copyright © Dan Jones <djones109@gmail.com>
+# Released under the terms of the New BSD License
+#
+# Based on vorbistagedit copyright © martin f. krafft <madduck@madduck.net>
 #
 
-VERSION=0.6
+VERSION=0.6.1
 ME=${0##*/}
 
 versioninfo() {
-  echo "vorbistagedit $VERSION" >&2
+  echo "tagedit $VERSION" >&2
   echo "\$Id$" >&2
-  echo "$ME is copyright © martin f. krafft" >&2
-  echo Released under the terms of the Artistic Licence 2.0 >&2
+  echo "$ME is copyright © Dan Jones" >&2
+  echo Released under the terms of the New BSD License >&2
 }
 
 usage() {
@@ -64,11 +66,11 @@ if [ $# -eq 0 ]; then
   exit 0
 fi
 
-TMPFILE=$(mktemp /tmp/vorbistagedit.XXXXXX)
+TMPFILE=$(mktemp /tmp/tagedit.XXXXXX)
 trap "rm -f $TMPFILE" 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
 
 cat <<_eof > $TMPFILE
-# vorbistagedit (\$Id$)
+# tagedit (\$Id$)
 #
 # Edit the lines in this file to your desire, but
 # DO NOT touch lines starting with a colon (:)!
