@@ -80,9 +80,15 @@ cat <<_eof > $TMPFILE
 # DO NOT touch lines starting with a colon (:)!
 # You may use lines starting with a plus (+) to rename files.
 #
-# When modifying id3 tags, tags can remain unmodified by 
-# deleting the line. To remove an id3, set the tag to an
+# ID3 tags are appended to the current tags, rather than 
+# replacing all tags, as with vorbis comments.
+# Therefore, to remove an ID3 tag, simply set it to an 
 # empty value.
+#
+# ID3 comments (COMM) should be formatted as 
+# <Description>:<Comment>:<lng>, where lng is a three-letter
+# language code, e.g., eng. <Comment> should not have any colons
+# (:) in it, due to a limitation of id3v2.
 #
 # We are in directory:
 #  $(pwd)
@@ -126,7 +132,7 @@ for i in "$@"; do
 
       echo ": $i"
       echo "+ $i"
-      id3v2 -R "$i" | sed -nr 's/^([A-Z]{3,4}): (.+)/\1=\2/p'
+      id3v2 -R "$i" | sed -nr -e 's/^(COMM): \((.*)\)\[(.*)\]: (.*)/\1=\2:\4:\3/p' -e 's/^([A-Z0-9]{3,4}): (.+)/\1=\2/p' | egrep -v '^(PRIV|APIC)'
       echo
       ;;
 
@@ -167,8 +173,12 @@ echo "I: processing files..." >&2
 write_tags() {
   echo -n "I:   processing $file... " >&2
   local file="$1"; shift
-  if [ "${file##*.}" == "mp3" ]; then
+  if [ "${file##*.}" = "mp3" ]; then
       echo "Modifying id3 tags not yet implemented"
+      echo "Global Tags:"
+      echo "$1"
+      echo "Tags:"
+      echo "$2"
   else
       for tag; do [ -n "${tag:-}" ] && echo "$tag"; done | \
 	  vorbiscomment -w "$file"
