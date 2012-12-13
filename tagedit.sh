@@ -161,11 +161,10 @@ write_tags() {
   echo -n "I:   processing $file... " >&2
   local file="$1"; shift
   if [ "${file##*.}" = "mp3" ]; then
-      echo "Modifying id3 tags not yet implemented"
-      echo "Global Tags:"
-      echo "$1"
-      echo "Tags:"
-      echo "$2"
+      for tag; do 
+	  [ -z "$tag" ] && continue
+	  id3v2 --"${tag%%=*}" "${tag#*=}" "$file"
+      done
   else
       for tag; do [ -n "${tag:-}" ] && echo "$tag"; done | \
 	  vorbiscomment -w "$file"
