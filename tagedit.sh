@@ -116,7 +116,10 @@ for i in "$@"; do
       echo ": $i"
       echo "+ $i"
       if [ "${i##*.}" = "mp3" ];then
-	  id3v2 -R "$i" | sed -nr -e 's/^(COMM): \((.*)\)\[(.*)\]: (.*)/\1=\2:\4:\3/p' -e 's/^([A-Z0-9]{3,4}): (.+)/\1=\2/p' | egrep -v '^(PRIV|APIC)'
+	  id3v2 -R "$i" | sed -nr \
+	      -e 's/^(COMM): \((.*)\)\[(.*)\]: (.*)/\1=\2:\4:\3/p' \
+	      -e 's/^(TCON): (.*) \([0-9]+\)/\1=\2/p' \
+	      -e 's/^([A-Z0-9]{3,4}): (.+)/\1=\2/p' | egrep -v '^(PRIV|APIC)'
       else
 	  vorbiscomment -l "$i"
       fi
