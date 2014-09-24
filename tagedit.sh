@@ -8,7 +8,7 @@
 # Based on vorbistagedit copyright © martin f. krafft <madduck@madduck.net>
 #
 
-VERSION=0.6.2.1
+VERSION=0.6.3
 ME=${0##*/}
 
 versioninfo() {
@@ -22,7 +22,7 @@ usage() {
   versioninfo
   echo
   echo Usage: $ME file1 [file2 [file3 ...]] >&2
-  echo .oga, .ogg, .ogv, .ogx, and .spx are the >&2
+  echo .mp3, .oga, .ogg, .ogv, .ogx, and .spx are the >&2
   echo supported file extensions >&2
   echo 
   echo If no filenames are given, the list of filenames >&2
@@ -119,7 +119,7 @@ for i in "$@"; do
 	  id3v2 -R "$i" | sed -nr \
 	      -e 's/^(COMM): \((.*)\)\[(.*)\]: (.*)/\1=\2:\4:\3/p' \
 	      -e 's/^(TCON): (.*) \([0-9]+\)/\1=\2/p' \
-	      -e 's/^([A-Z0-9]{3,4}): (.+)/\1=\2/p' | egrep -v '^(PRIV|APIC)'
+	      -e 's/^([A-Z0-9]{3,4}): (.+)/\1=\2/p' | egrep -v '^(PRIV|APIC)' || true
       else
 	  vorbiscomment -l "$i"
       fi
