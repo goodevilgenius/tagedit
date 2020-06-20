@@ -5,6 +5,10 @@ This, program, based on the fantastic vorbistagedit, written by martin f. krafft
 and included with the vorbis-tools package, allows a person to batch edit
 metadata within ogg and mp3 files from the person's preferred text editor.
 
+Before installing you will need to install
+- `vorbis-tools` (In Ubuntu this would be `sudo apt install vorbis-tools -y`)
+- `id3v2` (In Ubuntu this would be `sudo apt install id3v2 -y`)
+
 The basic usage is thus:
 
     tagedit <file.ogg> <file2.mp3> <file3.mp3> <file4.ogg> ...
